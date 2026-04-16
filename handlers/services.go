@@ -52,3 +52,60 @@ func GetService(w http.ResponseWriter, r *http.Request) {
 
 	Tmpl.ExecuteTemplate(w, "index.html", data)
 }
+
+func StartService(w http.ResponseWriter, r *http.Request) {
+	name := r.URL.Query().Get("service")
+	if name == "" {
+		http.Error(w, "service name required", http.StatusBadRequest)
+		return
+	}
+
+	if err := system.StartService(name); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	renderServiceList(w, name)
+}
+
+func StopService(w http.ResponseWriter, r *http.Request) {
+	name := r.URL.Query().Get("service")
+	if name == "" {
+		http.Error(w, "service name required", http.StatusBadRequest)
+		return
+	}
+
+	if err := system.StopService(name); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	renderServiceList(w, name)
+}
+
+func RestartService(w http.ResponseWriter, r *http.Request) {
+	name := r.URL.Query().Get("service")
+	if name == "" {
+		http.Error(w, "service name required", http.StatusBadRequest)
+		return
+	}
+
+	if err := system.RestartService(name); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	renderServiceList(w, name)
+}
+
+func renderServiceList(w http.ResponseWriter, selected string) {
+	files, _ := system.ListQuadletFiles()
+	services, _ := ToServices(files)
+
+	data := PageData{
+		Services: services,
+		Selected: selected,
+	}
+
+	Tmpl.ExecuteTemplate(w, "service-list", data)
+}
