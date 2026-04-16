@@ -1,0 +1,9 @@
+{{define "quadlet-preview"}}
+{{range .Files}}
+<div style="margin-bottom: 1rem;">
+	<strong>{{.Name}}</strong>
+	<pre>{{.Content}}</pre>
+</div>
+{{end}}
+<input type="hidden" name="quadlet-data" value="{{.EncodedData}}">
+{{end}}

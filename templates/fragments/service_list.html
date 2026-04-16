@@ -1,0 +1,15 @@
+{{define "service-list"}}
+{{range .Services}}
+<div class="service-item {{if eq .Name $.Selected}}active{{end}}" 
+     hx-get="/service/{{.Name}}" 
+     hx-target="#main-content"
+     hx-swap="innerHTML">
+	<span>{{.Name}}</span>
+	{{if eq .Status "running"}}<span class="status-running">●</span>
+	{{else if eq .Status "failed"}}<span class="status-failed">●</span>
+	{{else}}<span class="status-stopped">○</span>{{end}}
+</div>
+{{else}}
+<p style="color: var(--muted-color);">No services yet</p>
+{{end}}
+{{end}}

@@ -1,0 +1,42 @@
+{{define "service-detail"}}
+{{if .Service}}
+<div class="main-header">
+	<hgroup style="margin: 0;">
+		<h4 style="margin: 0;">{{.Service.Name}}</h4>
+		<p style="margin: 0;">
+			{{if eq .Service.Status "running"}}<span class="status-running">● Running</span>
+			{{else if eq .Service.Status "failed"}}<span class="status-failed">● Failed</span>
+			{{else}}<span class="status-stopped">○ Stopped</span>{{end}}
+		</p>
+	</hgroup>
+	<div class="btn-group" style="margin-left: auto;">
+		{{if eq .Service.Status "running"}}
+		<button hx-post="/stop?service={{.Service.Name}}" hx-target="#service-list" hx-swap="innerHTML">Stop</button>
+		<button hx-post="/restart?service={{.Service.Name}}" hx-target="#service-list" hx-swap="innerHTML">Restart</button>
+		{{else}}
+		<button hx-post="/start?service={{.Service.Name}}" hx-target="#service-list" hx-swap="innerHTML">Start</button>
+		{{end}}
+		<a href="/edit?service={{.Service.Name}}" role="button" class="secondary">Edit</a>
+		<button class="contrast" onclick="if(confirm('Delete {{.Service.Name}}?')){htmx.trigger(this, 'delete-service')}" hx-post="/delete?service={{.Service.Name}}" hx-target="#service-list" hx-swap="innerHTML">Delete</button>
+	</div>
+</div>
+<div class="main-content">
+	<div class="panel">
+		<div class="panel-header">Quadlet</div>
+		<div class="panel-content">
+			<pre>{{.Service.QuadletContent}}</pre>
+		</div>
+	</div>
+	<div class="panel">
+		<div class="panel-header">Logs</div>
+		<div class="panel-content logs" hx-ext="sse" sse-connect="/logs?service={{.Service.Name}}" sse-swap="message" hx-swap="beforeend">
+			Loading logs...
+		</div>
+	</div>
+</div>
+{{else}}
+<div class="main-content" style="align-items: center; justify-content: center;">
+	<p style="color: var(--muted-color);">Select a service or create a new one</p>
+</div>
+{{end}}
+{{end}}
