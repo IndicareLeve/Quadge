@@ -34,7 +34,7 @@ func ConvertCompose(composeContent string) ([]QuadletResult, error) {
 	}
 	composeFile.Close()
 
-	cmd := exec.Command("podlet", "compose", "--file", outputDir, composeFile.Name())
+	cmd := exec.Command("podlet", "--file", outputDir, "compose", composeFile.Name())
 	if output, err := cmd.CombinedOutput(); err != nil {
 		return nil, fmt.Errorf("running podlet: %w\n%s", err, output)
 	}
