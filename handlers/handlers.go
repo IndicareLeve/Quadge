@@ -19,6 +19,13 @@ type PageData struct {
 	Services []Service
 	Selected string
 	Service  *Service
+	Edit     *EditData
+}
+
+type EditData struct {
+	Name    string
+	Content string
+	Ext     string
 }
 
 type ConvertResult struct {

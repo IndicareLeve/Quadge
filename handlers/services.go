@@ -50,7 +50,7 @@ func GetService(w http.ResponseWriter, r *http.Request) {
 		},
 	}
 
-	Tmpl.ExecuteTemplate(w, "index.html", data)
+	Tmpl.ExecuteTemplate(w, "main-content", data)
 }
 
 func StartService(w http.ResponseWriter, r *http.Request) {

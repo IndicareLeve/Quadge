@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"fmt"
+	"html"
 	"net/http"
 
 	"github.com/indicareleve/quadge/system"
@@ -35,12 +36,12 @@ func StreamLogs(w http.ResponseWriter, r *http.Request) {
 	scanner := system.NewLogScanner(reader)
 	for scanner.Scan() {
 		line := scanner.Text()
-		fmt.Fprintf(w, "data: %s\n\n", line)
+		fmt.Fprintf(w, "data: <div class=\"log-line\">%s</div>\n\n", html.EscapeString(line))
 		flusher.Flush()
 	}
 
 	if scanner.Err() != nil {
-		fmt.Fprintf(w, "data: Error: %s\n\n", scanner.Err().Error())
+		fmt.Fprintf(w, "data: <div class=\"log-line log-error\">Error: %s</div>\n\n", html.EscapeString(scanner.Err().Error()))
 		flusher.Flush()
 	}
 }

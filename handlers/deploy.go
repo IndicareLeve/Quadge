@@ -35,5 +35,13 @@ func DeployService(w http.ResponseWriter, r *http.Request) {
 		system.StartService(f.Name)
 	}
 
-	http.Redirect(w, r, "/", http.StatusSeeOther)
+	allFiles, _ := system.ListQuadletFiles()
+	services, _ := ToServices(allFiles)
+
+	data := PageData{
+		Services: services,
+		Selected: files[0].Name,
+	}
+
+	Tmpl.ExecuteTemplate(w, "main-content", data)
 }

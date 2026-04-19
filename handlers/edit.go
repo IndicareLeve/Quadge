@@ -19,15 +19,20 @@ func EditServiceForm(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data := struct {
-		Name    string
-		Content string
-	}{
-		Name:    file.Name,
-		Content: file.Content,
+	data := PageData{
+		Selected: name,
+		Service: &Service{
+			Name:           file.Name,
+			QuadletContent: file.Content,
+		},
+		Edit: &EditData{
+			Name:    file.Name,
+			Content: file.Content,
+			Ext:     "." + file.Type,
+		},
 	}
 
-	Tmpl.ExecuteTemplate(w, "edit.html", data)
+	Tmpl.ExecuteTemplate(w, "edit-service", data)
 }
 
 func EditService(w http.ResponseWriter, r *http.Request) {
@@ -57,5 +62,17 @@ func EditService(w http.ResponseWriter, r *http.Request) {
 
 	system.RestartService(name)
 
-	http.Redirect(w, r, "/", http.StatusSeeOther)
+	files, _ := system.ListQuadletFiles()
+	services, _ := ToServices(files)
+
+	data := PageData{
+		Services: services,
+		Selected: name,
+		Service: &Service{
+			Name:           name,
+			QuadletContent: content,
+		},
+	}
+
+	Tmpl.ExecuteTemplate(w, "service-detail", data)
 }

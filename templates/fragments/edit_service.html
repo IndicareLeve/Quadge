@@ -1,0 +1,41 @@
+{{define "edit-service"}}
+<div class="main-header">
+    <hgroup style="margin: 0;">
+        <h4 style="margin: 0;">{{.Edit.Name}}</h4>
+        <p style="margin: 0;">Editing</p>
+    </hgroup>
+    <div class="btn-group" style="margin-left: auto;">
+        <button hx-get="/service/{{.Edit.Name}}" hx-target="#main-content" hx-swap="innerHTML" class="secondary outline">Cancel</button>
+    </div>
+</div>
+<div class="main-content">
+    <div class="panel">
+        <div class="panel-header">Actions</div>
+        <div class="panel-content" style="display: flex; flex-direction: column; gap: 1rem;">
+            <div id="edit-status" style="color: var(--muted-color); font-size: 0.9rem;">
+                Edit the quadlet file, then Save
+            </div>
+            <form id="edit-form" hx-post="/edit" hx-target="#main-content" hx-swap="innerHTML">
+                <input type="hidden" name="name" value="{{.Edit.Name}}">
+                <textarea id="edit-content" name="content" style="display: none;">{{.Edit.Content}}</textarea>
+                <button type="submit" style="width: 100%;">Save</button>
+            </form>
+        </div>
+    </div>
+    <div class="panel">
+        <div class="panel-header">{{.Edit.Name}}{{.Edit.Ext}}</div>
+        <div class="panel-content" style="display: flex; flex-direction: column; padding: 0;">
+            <textarea id="edit-editor" style="flex: 1; width: 100%; font-family: monospace; resize: none; border: none; background: transparent; padding: 0.5rem;">{{.Edit.Content}}</textarea>
+        </div>
+    </div>
+</div>
+<script>
+(function() {
+    var editor = document.getElementById('edit-editor');
+    var hidden = document.getElementById('edit-content');
+    editor.addEventListener('input', function() {
+        hidden.value = editor.value;
+    });
+})();
+</script>
+{{end}}

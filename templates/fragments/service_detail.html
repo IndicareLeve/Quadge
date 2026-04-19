@@ -16,24 +16,24 @@
 		{{else}}
 		<button hx-post="/start?service={{.Service.Name}}" hx-target="#service-list" hx-swap="innerHTML">Start</button>
 		{{end}}
-		<a href="/edit?service={{.Service.Name}}" role="button" class="secondary">Edit</a>
+		<button hx-get="/edit?service={{.Service.Name}}" hx-target="#main-content" hx-swap="innerHTML" class="secondary">Edit</button>
 		<button class="contrast" onclick="if(confirm('Delete {{.Service.Name}}?')){htmx.trigger(this, 'delete-service')}" hx-post="/delete?service={{.Service.Name}}" hx-target="#service-list" hx-swap="innerHTML">Delete</button>
 	</div>
 </div>
 <div class="main-content">
 	<div class="panel">
-		<div class="panel-header">Quadlet</div>
-		<div class="panel-content">
-			<pre>{{.Service.QuadletContent}}</pre>
+		<div class="panel-header">Logs</div>
+		<div class="panel-content logs" hx-ext="sse" sse-connect="/logs?service={{.Service.Name}}" sse-swap="message" hx-swap="beforeend">
 		</div>
 	</div>
 	<div class="panel">
-		<div class="panel-header">Logs</div>
-		<div class="panel-content logs" hx-ext="sse" sse-connect="/logs?service={{.Service.Name}}" sse-swap="message" hx-swap="beforeend">
-			Loading logs...
+		<div class="panel-header">Quadlet</div>
+		<div class="panel-content" style="background: #1a1a1a; display: flex; flex-direction: column; padding: 0;">
+			<pre style="flex: 1; margin: 0; padding: 0.5rem; overflow: auto;"><code class="language-ini" id="quadlet-code">{{.Service.QuadletContent}}</code></pre>
 		</div>
 	</div>
 </div>
+<script>hljs.highlightElement(document.getElementById('quadlet-code'));</script>
 {{else}}
 <div class="main-content" style="align-items: center; justify-content: center;">
 	<p style="color: var(--muted-color);">Select a service or create a new one</p>

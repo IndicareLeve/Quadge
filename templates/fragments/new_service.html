@@ -9,7 +9,7 @@
             <div id="status-area" style="color: var(--muted-color); font-size: 0.9rem;">
                 Paste a docker-compose.yml to convert
             </div>
-            <form id="deploy-form" hx-post="/deploy" hx-target="body" hx-swap="outerHTML">
+            <form id="deploy-form" hx-post="/deploy" hx-target="#main-content" hx-swap="innerHTML">
                 <input type="hidden" name="quadlet-data" id="quadlet-data" value="">
                 <button type="submit" id="deploy-btn" disabled style="width: 100%;">Deploy</button>
             </form>
@@ -18,7 +18,7 @@
     <div class="panel">
         <div class="panel-header">docker-compose.yml</div>
         <div class="panel-content" style="display: flex; flex-direction: column; padding: 0;">
-            <textarea id="compose-editor" name="compose" placeholder="version: '3'
+            <textarea id="compose-editor" placeholder="version: '3'
 services:
   nginx:
     image: nginx:latest
@@ -32,56 +32,45 @@ services:
     var editor = document.getElementById('compose-editor');
     var deployBtn = document.getElementById('deploy-btn');
     var statusArea = document.getElementById('status-area');
-    var quadletData = document.querySelector('input[name="quadlet-data"]');
+    var quadletData = document.getElementById('quadlet-data');
     var isConverting = false;
+    var quadletFiles = null;
 
     editor.addEventListener('paste', function(e) {
-        if (isConverting) {
-            e.preventDefault();
-            return;
-        }
+        if (isConverting) { e.preventDefault(); return; }
 
         var pastedText = (e.clipboardData || window.clipboardData).getData('text');
         if (!pastedText || !pastedText.trim()) return;
 
         e.preventDefault();
         editor.value = pastedText;
-
         isConverting = true;
         deployBtn.disabled = true;
         statusArea.textContent = 'Converting...';
-        statusArea.style.color = '';
         statusArea.className = '';
 
         var formData = new FormData();
         formData.append('compose', pastedText);
 
-        fetch('/convert', {
-            method: 'POST',
-            body: formData
-        })
+        fetch('/convert', { method: 'POST', body: formData })
         .then(function(res) {
-            if (!res.ok) {
-                throw new Error('Conversion failed (HTTP ' + res.status + ')');
-            }
+            if (!res.ok) throw new Error('Conversion failed (HTTP ' + res.status + ')');
             return res.text();
         })
         .then(function(html) {
             var parser = new DOMParser();
             var doc = parser.parseFromString(html, 'text/html');
             var hiddenInput = doc.querySelector('input[name="quadlet-data"]');
-            if (hiddenInput && hiddenInput.value) {
+            var previewDiv = doc.querySelector('pre');
+            if (hiddenInput && hiddenInput.value && previewDiv) {
                 quadletData.value = hiddenInput.value;
+                quadletFiles = JSON.parse(atob(hiddenInput.value));
+                editor.value = previewDiv.textContent || previewDiv.innerText;
                 deployBtn.disabled = false;
-                statusArea.textContent = 'Converted successfully';
+                statusArea.textContent = 'Converted — edit if needed, then Deploy';
                 statusArea.className = 'status-success';
-
-                var previewDiv = doc.querySelector('pre');
-                if (previewDiv) {
-                    editor.value = previewDiv.textContent || previewDiv.innerText;
-                }
             } else {
-                throw new Error('Conversion returned no quadlet data');
+                throw new Error('Conversion returned no content');
             }
         })
         .catch(function(err) {
@@ -89,9 +78,14 @@ services:
             statusArea.className = 'status-error';
             deployBtn.disabled = true;
         })
-        .finally(function() {
-            isConverting = false;
-        });
+        .finally(function() { isConverting = false; });
+    });
+
+    editor.addEventListener('input', function() {
+        if (quadletFiles && quadletFiles.length > 0) {
+            quadletFiles[0].Content = editor.value;
+            quadletData.value = btoa(JSON.stringify(quadletFiles));
+        }
     });
 })();
 </script>
