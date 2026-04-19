@@ -33,40 +33,65 @@ services:
     var deployBtn = document.getElementById('deploy-btn');
     var statusArea = document.getElementById('status-area');
     var quadletData = document.getElementById('quadlet-data');
+    var isConverting = false;
 
     editor.addEventListener('paste', function(e) {
-        setTimeout(function() {
-            var content = editor.value;
-            if (!content.trim()) return;
+        if (isConverting) {
+            e.preventDefault();
+            return;
+        }
 
-            var formData = new FormData();
-            formData.append('compose', content);
+        var pastedText = (e.clipboardData || window.clipboardData).getData('text');
+        if (!pastedText || !pastedText.trim()) return;
 
-            fetch('/convert', {
-                method: 'POST',
-                body: formData
-            })
-            .then(function(res) { return res.text(); })
-            .then(function(html) {
-                if (html.indexOf('Error') === -1 && html.indexOf('quadlet-data') !== -1) {
-                    var parser = new DOMParser();
-                    var doc = parser.parseFromString(html, 'text/html');
-                    var hiddenInput = doc.querySelector('input[name="quadlet-data"]');
-                    if (hiddenInput && hiddenInput.value) {
-                        quadletData.value = hiddenInput.value;
-                        deployBtn.disabled = false;
-                        statusArea.textContent = 'Converted successfully';
-                        statusArea.style.color = 'green';
+        e.preventDefault();
+        editor.value = pastedText;
 
-                        var previewDiv = doc.querySelector('.preview, [id^="quadlet"]');
-                        if (previewDiv) {
-                            editor.value = previewDiv.textContent || previewDiv.innerText;
-                        }
-                    }
+        isConverting = true;
+        deployBtn.disabled = true;
+        statusArea.textContent = 'Converting...';
+        statusArea.style.color = '';
+        statusArea.className = '';
+
+        var formData = new FormData();
+        formData.append('compose', pastedText);
+
+        fetch('/convert', {
+            method: 'POST',
+            body: formData
+        })
+        .then(function(res) {
+            if (!res.ok) {
+                throw new Error('Conversion failed (HTTP ' + res.status + ')');
+            }
+            return res.text();
+        })
+        .then(function(html) {
+            var parser = new DOMParser();
+            var doc = parser.parseFromString(html, 'text/html');
+            var hiddenInput = doc.querySelector('input[name="quadlet-data"]');
+            if (hiddenInput && hiddenInput.value) {
+                quadletData.value = hiddenInput.value;
+                deployBtn.disabled = false;
+                statusArea.textContent = 'Converted successfully';
+                statusArea.className = 'status-success';
+
+                var previewDiv = doc.querySelector('.preview, [id^="quadlet"]');
+                if (previewDiv) {
+                    editor.value = previewDiv.textContent || previewDiv.innerText;
                 }
-            })
-            .catch(function() {});
-        }, 100);
+            } else {
+                throw new Error('Conversion returned no quadlet data');
+            }
+        })
+        .catch(function(err) {
+            statusArea.textContent = err.message || 'Conversion failed';
+            statusArea.className = 'status-error';
+            deployBtn.disabled = true;
+        })
+        .finally(function() {
+            isConverting = false;
+        });
     });
 })();
 </script>
