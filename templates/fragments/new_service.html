@@ -1,0 +1,73 @@
+{{define "new-service"}}
+<div class="main-header">
+    <h4 style="margin: 0;">New Service</h4>
+</div>
+<div class="main-content">
+    <div class="panel">
+        <div class="panel-header">Actions</div>
+        <div class="panel-content" style="display: flex; flex-direction: column; gap: 1rem;">
+            <div id="status-area" style="color: var(--muted-color); font-size: 0.9rem;">
+                Paste a docker-compose.yml to convert
+            </div>
+            <form id="deploy-form" hx-post="/deploy" hx-target="body" hx-swap="outerHTML">
+                <input type="hidden" name="quadlet-data" id="quadlet-data" value="">
+                <button type="submit" id="deploy-btn" disabled style="width: 100%;">Deploy</button>
+            </form>
+        </div>
+    </div>
+    <div class="panel">
+        <div class="panel-header">docker-compose.yml</div>
+        <div class="panel-content">
+            <textarea id="compose-editor" name="compose" placeholder="version: '3'
+services:
+  nginx:
+    image: nginx:latest
+    ports:
+      - '80:80'" style="width: 100%; min-height: 100%; font-family: monospace; resize: none; border: none; background: transparent;"></textarea>
+        </div>
+    </div>
+</div>
+<script>
+(function() {
+    var editor = document.getElementById('compose-editor');
+    var deployBtn = document.getElementById('deploy-btn');
+    var statusArea = document.getElementById('status-area');
+    var quadletData = document.getElementById('quadlet-data');
+
+    editor.addEventListener('paste', function(e) {
+        setTimeout(function() {
+            var content = editor.value;
+            if (!content.trim()) return;
+
+            var formData = new FormData();
+            formData.append('compose', content);
+
+            fetch('/convert', {
+                method: 'POST',
+                body: formData
+            })
+            .then(function(res) { return res.text(); })
+            .then(function(html) {
+                if (html.indexOf('Error') === -1 && html.indexOf('quadlet-data') !== -1) {
+                    var parser = new DOMParser();
+                    var doc = parser.parseFromString(html, 'text/html');
+                    var hiddenInput = doc.querySelector('input[name="quadlet-data"]');
+                    if (hiddenInput && hiddenInput.value) {
+                        quadletData.value = hiddenInput.value;
+                        deployBtn.disabled = false;
+                        statusArea.textContent = 'Converted successfully';
+                        statusArea.style.color = 'green';
+
+                        var previewDiv = doc.querySelector('.preview, [id^="quadlet"]');
+                        if (previewDiv) {
+                            editor.value = previewDiv.textContent || previewDiv.innerText;
+                        }
+                    }
+                }
+            })
+            .catch(function() {});
+        }, 100);
+    });
+})();
+</script>
+{{end}}
