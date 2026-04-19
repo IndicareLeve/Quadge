@@ -8,7 +8,7 @@ import (
 )
 
 func StreamLogs(name string) (io.ReadCloser, error) {
-	cmd := exec.Command("journalctl", "--user", "-u", name+".service", "-f", "-n", "50")
+	cmd := exec.Command("journalctl", "--user", "-u", name+".service", "-f", "-n", "50", "--output=json")
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
 		return nil, fmt.Errorf("creating stdout pipe: %w", err)

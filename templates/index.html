@@ -159,18 +159,7 @@
 		});
 		document.body.addEventListener('htmx:sseMessage', function(evt) {
 			var el = evt.detail.elt;
-			el.querySelectorAll('.log-line:not(.highlighted)').forEach(function(line) {
-				line.classList.add('highlighted');
-				var text = line.textContent;
-				var replaced = text
-					.replace(/\b(ERROR|FATAL|CRITICAL)\b/g, '<span class="log-error">$1</span>')
-					.replace(/\b(WARN|WARNING)\b/g, '<span class="log-warn">$1</span>')
-					.replace(/\b(INFO|NOTICE)\b/g, '<span class="log-info">$1</span>')
-					.replace(/\b(DEBUG|TRACE)\b/g, '<span class="log-debug">$1</span>');
-				if (replaced !== text) {
-					line.innerHTML = replaced;
-				}
-			});
+			el.scrollTop = el.scrollHeight;
 		});
 	</script>
 </body>
