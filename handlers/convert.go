@@ -6,8 +6,8 @@ import (
 	"github.com/indicareleve/quadge/system"
 )
 
-func NewServiceForm(w http.ResponseWriter, r *http.Request) {
-	Tmpl.ExecuteTemplate(w, "new.html", nil)
+func NewServiceFragment(w http.ResponseWriter, r *http.Request) {
+	Tmpl.ExecuteTemplate(w, "new-service", nil)
 }
 
 func ConvertCompose(w http.ResponseWriter, r *http.Request) {

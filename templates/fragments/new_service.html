@@ -32,7 +32,7 @@ services:
     var editor = document.getElementById('compose-editor');
     var deployBtn = document.getElementById('deploy-btn');
     var statusArea = document.getElementById('status-area');
-    var quadletData = document.getElementById('quadlet-data');
+    var quadletData = document.querySelector('input[name="quadlet-data"]');
     var isConverting = false;
 
     editor.addEventListener('paste', function(e) {
@@ -76,7 +76,7 @@ services:
                 statusArea.textContent = 'Converted successfully';
                 statusArea.className = 'status-success';
 
-                var previewDiv = doc.querySelector('.preview, [id^="quadlet"]');
+                var previewDiv = doc.querySelector('pre');
                 if (previewDiv) {
                     editor.value = previewDiv.textContent || previewDiv.innerText;
                 }

@@ -132,7 +132,7 @@
 	<div class="layout">
 		<aside class="sidebar">
 			<h3>Quadge</h3>
-			<a href="/new" role="button" class="outline" style="margin-bottom: 1rem;">+ New Service</a>
+			<button hx-get="/new" hx-target="#main-content" class="outline" style="margin-bottom: 1rem;">+ New Service</button>
 			<div class="service-list" id="service-list">
 				{{template "service-list" .}}
 			</div>

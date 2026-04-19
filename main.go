@@ -27,7 +27,7 @@ func main() {
 	handlers.Tmpl = tmpl
 
 	r.Get("/", handlers.ListServices)
-	r.Get("/new", handlers.NewServiceForm)
+	r.Get("/new", handlers.NewServiceFragment)
 	r.Post("/convert", handlers.ConvertCompose)
 	r.Post("/deploy", handlers.DeployService)
 	r.Get("/service/{name}", handlers.GetService)
@@ -44,8 +44,8 @@ func main() {
 		port = "4440"
 	}
 
-	fmt.Printf("Quadge starting on :%s\n", port)
-	if err := http.ListenAndServe(":"+port, r); err != nil {
+	fmt.Printf("Quadge starting on 0.0.0.0:%s\n", port)
+	if err := http.ListenAndServe("0.0.0.0:"+port, r); err != nil {
 		fmt.Fprintf(os.Stderr, "Server error: %v\n", err)
 		os.Exit(1)
 	}
