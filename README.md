@@ -24,19 +24,21 @@
 - [Podlet](https://github.com/containers/podlet) — `podlet compose` for conversion
 - systemd (user mode)
 
-### Build
+### Build & Run
 
 ```bash
-go build -o quadge .
+make build   # Build release binary
+make dev     # Run dev server on :4440
 ```
 
-### Run
+### Install as Systemd Service
 
 ```bash
-./quadge
-# Server starts on http://localhost:4440
-# Override: QUADGE_PORT=8080 ./quadge
+make install    # Build, install, enable, and start service
+make uninstall  # Stop, disable, and remove service
 ```
+
+After install, access at `http://localhost:4440`.
 
 ### Systemd Service
 
