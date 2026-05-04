@@ -40,22 +40,6 @@ make uninstall  # Stop, disable, and remove service
 
 After install, access at `http://localhost:4440`.
 
-### Systemd Service
-
-```ini
-[Unit]
-Description=Quadge - Podman Quadlet Web Manager
-After=network.target
-
-[Service]
-Type=simple
-ExecStart=/usr/local/bin/quadge
-Restart=on-failure
-
-[Install]
-WantedBy=default.target
-```
-
 ## Usage
 
 1. Open `http://localhost:4440`
