@@ -10,3 +10,12 @@ build:
 
 dev:
 	go run .
+
+install: build
+	mkdir -p $(INSTALL_DIR)
+	cp $(BINARY_NAME) $(INSTALL_DIR)/
+	mkdir -p $(SERVICE_DIR)
+	cp $(SERVICE_FILE) $(SERVICE_DIR)/
+	systemctl --user daemon-reload
+	systemctl --user enable --now $(BINARY_NAME)
+	@echo "Quadge installed and started. Check status: systemctl --user status $(BINARY_NAME)"
