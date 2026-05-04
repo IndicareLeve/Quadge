@@ -1,0 +1,12 @@
+[Unit]
+Description=Quadge - Podman Quadlet Web Manager
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=%h/.local/bin/quadge
+Restart=on-failure
+Environment=QUADGE_PORT=4440
+
+[Install]
+WantedBy=default.target
