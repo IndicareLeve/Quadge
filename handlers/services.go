@@ -165,3 +165,27 @@ func calcGroupStatus(members []Service) GroupStatus {
 	}
 	return GroupStatusStopped
 }
+
+func GetGroupChildren(w http.ResponseWriter, r *http.Request) {
+	name := r.PathValue("name")
+
+	files, err := system.ListQuadletFiles()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	tree := system.BuildServiceTree(files)
+	for _, g := range tree.Groups {
+		if g.Name == name {
+			members := toServices(g.Members)
+			data := PageData{
+				Members: members,
+			}
+			Tmpl.ExecuteTemplate(w, "group-children", data)
+			return
+		}
+	}
+
+	http.Error(w, "group not found", http.StatusNotFound)
+}

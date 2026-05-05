@@ -35,6 +35,7 @@ type PageData struct {
 	Services   []Service
 	Groups     []ServiceGroup
 	Standalone []Service
+	Members    []Service
 	Selected   string
 	Service    *Service
 	Edit       *EditData
