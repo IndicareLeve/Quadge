@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 )
 
@@ -214,6 +215,13 @@ func BuildServiceTree(files []QuadletFile) ServiceTree {
 			standalone = append(standalone, f)
 		}
 	}
+
+	slices.SortFunc(groups, func(a, b ServiceGroup) int {
+		return strings.Compare(a.Name, b.Name)
+	})
+	slices.SortFunc(standalone, func(a, b QuadletFile) int {
+		return strings.Compare(a.Name, b.Name)
+	})
 
 	return ServiceTree{
 		Groups:     groups,

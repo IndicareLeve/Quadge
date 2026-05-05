@@ -19,6 +19,11 @@ func DeployService(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if len(files) == 0 {
+		http.Error(w, "no quadlet files in data", http.StatusBadRequest)
+		return
+	}
+
 	for _, f := range files {
 		if err := system.WriteQuadletFile(f.Name, f.Ext, f.Content); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)

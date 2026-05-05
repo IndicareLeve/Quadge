@@ -27,7 +27,6 @@ const (
 
 type ServiceGroup struct {
 	Name    string
-	PodFile QuadletFileView
 	Members []Service
 	Status  GroupStatus
 }

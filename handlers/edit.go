@@ -67,15 +67,22 @@ func EditService(w http.ResponseWriter, r *http.Request) {
 
 	system.RestartService(name)
 
+	status, _ := system.GetServiceStatus(name)
 	files, _ := system.ListQuadletFiles()
-	services, _ := ToServices(files)
+	tree := system.BuildServiceTree(files)
+	parentGroup := findParentGroup(name, tree.Groups)
+	groups := toServiceGroups(tree.Groups)
+	standalone := toServices(tree.Standalone)
 
 	data := PageData{
-		Services: services,
-		Selected: name,
+		Groups:     groups,
+		Standalone: standalone,
+		Selected:   name,
 		Service: &Service{
 			Name:           name,
+			Status:         status,
 			QuadletContent: content,
+			ParentGroup:    parentGroup,
 		},
 	}
 

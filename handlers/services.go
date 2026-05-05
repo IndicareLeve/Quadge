@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/indicareleve/quadge/system"
 )
@@ -138,9 +139,16 @@ func DeleteGroup(w http.ResponseWriter, r *http.Request) {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
+			var errs []string
 			for _, m := range g.Members {
 				system.StopService(m.Name)
-				system.DeleteQuadletFile(m.Name)
+				if err := system.DeleteQuadletFile(m.Name); err != nil {
+					errs = append(errs, m.Name+": "+err.Error())
+				}
+			}
+			if len(errs) > 0 {
+				http.Error(w, "partial delete: "+strings.Join(errs, "; "), http.StatusInternalServerError)
+				return
 			}
 			if err := system.DaemonReload(); err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
