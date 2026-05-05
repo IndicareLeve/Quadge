@@ -12,12 +12,23 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/ini.min.js"></script>
 	<style>
 		:root {
-			--sidebar-width: 220px;
+			--accent: #ffd600;
+			--accent-hover: #e6c200;
+			--border-thick: 3px solid #000;
+			--shadow-offset: 4px;
+			--shadow: 4px 4px 0 #000;
+			--radius: 0;
+			--sidebar-width: 240px;
+			--font-body: system-ui, -apple-system, sans-serif;
+			--font-mono: 'JetBrains Mono', 'Fira Code', monospace;
 		}
+		* { box-sizing: border-box; }
 		body {
 			margin: 0;
 			padding: 0;
 			min-height: 100vh;
+			font-family: var(--font-body);
+			background: #fefefe;
 		}
 		.layout {
 			display: flex;
@@ -25,31 +36,69 @@
 		}
 		.sidebar {
 			width: var(--sidebar-width);
-			background: var(--card-background-color);
-			border-right: 1px solid var(--muted-border-color);
+			background: var(--accent);
+			border-right: var(--border-thick);
 			padding: 1rem;
 			display: flex;
 			flex-direction: column;
 		}
 		.sidebar h3 {
-			margin-bottom: 0.5rem;
+			margin: 0 0 0.75rem 0;
+			font-weight: 900;
+			font-size: 1.2rem;
+			letter-spacing: 1px;
+			text-transform: uppercase;
 		}
 		.service-list {
 			flex: 1;
 			overflow-y: auto;
 		}
 		.service-item {
-			padding: 0.5rem;
+			padding: 0.4rem 0.5rem;
 			cursor: pointer;
-			border-radius: var(--border-radius);
+			border-radius: 0;
 			margin-bottom: 0.25rem;
+			font-weight: 700;
+			font-size: 0.85rem;
+			border: 2px solid transparent;
 		}
 		.service-item:hover {
-			background: var(--primary-background);
+			background: rgba(255,255,255,0.5);
 		}
 		.service-item.active {
-			background: var(--primary);
-			color: var(--primary-inverse);
+			background: #fff;
+			border-color: #000;
+		}
+		.group-item {
+			padding: 0.4rem 0.5rem;
+			cursor: pointer;
+			font-weight: 800;
+			font-size: 0.85rem;
+			background: #fff3a0;
+			border: 2px solid #000;
+			margin-bottom: 0;
+		}
+		.group-item:hover {
+			background: var(--accent);
+		}
+		.group-children {
+			margin-left: 0.75rem;
+			border-left: 2px solid #000;
+		}
+		.group-child-item {
+			padding: 0.3rem 0.5rem;
+			cursor: pointer;
+			font-weight: 600;
+			font-size: 0.8rem;
+			background: #fff;
+			margin-bottom: 0;
+			border-left: 2px solid #000;
+		}
+		.group-child-item:hover {
+			background: #f0f0f0;
+		}
+		.group-child-item.active {
+			background: var(--accent);
 		}
 		.main {
 			flex: 1;
@@ -59,10 +108,15 @@
 		}
 		.main-header {
 			padding: 1rem;
-			border-bottom: 1px solid var(--muted-border-color);
+			border-bottom: var(--border-thick);
 			display: flex;
 			align-items: center;
 			gap: 1rem;
+			background: #fff;
+		}
+		.main-header h4 {
+			font-weight: 900;
+			margin: 0;
 		}
 		.main-content {
 			flex: 1;
@@ -79,43 +133,46 @@
 			overflow: hidden;
 		}
 		.panel-header {
-			font-weight: bold;
+			font-weight: 800;
 			margin-bottom: 0.5rem;
+			text-transform: uppercase;
+			letter-spacing: 1px;
+			font-size: 0.75rem;
 		}
 		.panel-content {
 			flex: 1;
 			overflow-y: auto;
 			min-height: 0;
-			background: var(--card-background-color);
+			background: #f0f0f0;
 			padding: 0.5rem;
-			border-radius: var(--border-radius);
+			border: var(--border-thick);
+			box-shadow: var(--shadow);
 		}
-		.status-running { color: green; }
-		.status-stopped { color: var(--muted-color); }
-		.status-failed { color: red; }
-		.status-success { color: green; }
-		.status-error { color: red; }
+		.status-running { color: #0a0; font-weight: bold; }
+		.status-stopped { color: #888; }
+		.status-failed { color: #dc3545; font-weight: bold; }
+		.status-success { color: #0a0; }
+		.status-error { color: #dc3545; }
+		.status-degraded { color: #e6c200; font-weight: bold; }
 		pre {
 			margin: 0;
 			white-space: pre-wrap;
 			font-size: 0.85rem;
+			font-family: var(--font-mono);
 		}
 		.logs {
-			font-family: monospace;
+			font-family: var(--font-mono);
 			font-size: 0.8rem;
 			line-height: 1.4;
-			background: #1a1a1a;
+			background: #1a1a2e;
 			padding: 0.75rem;
+			color: #ccc;
 		}
-		.log-line {
-			margin: 0;
-			padding: 0;
-		}
+		.log-line { margin: 0; padding: 0; }
 		.log-error { color: #ff6b6b; font-weight: bold; }
 		.log-warn { color: #ffa94d; }
 		.log-info { color: #4dabf7; }
 		.log-debug { color: #868e96; }
-		.log-line.error { color: #ff6b6b; }
 		.hljs {
 			background: transparent !important;
 			padding: 0 !important;
@@ -129,11 +186,77 @@
 		.btn-group {
 			display: flex;
 			gap: 0.5rem;
+			margin-left: auto;
 		}
 		.btn-group button {
-			padding: 0.25rem 0.75rem;
-			font-size: 0.85rem;
+			padding: 0.3rem 0.75rem;
+			font-size: 0.8rem;
+			font-weight: 700;
+			border: 2px solid #000;
+			border-radius: 0;
+			cursor: pointer;
+			box-shadow: 2px 2px 0 #000;
+			text-transform: uppercase;
+			letter-spacing: 0.5px;
 		}
+		.btn-group button:active {
+			box-shadow: 0 0 0 #000;
+			transform: translate(2px, 2px);
+		}
+		.btn-group button:hover {
+			box-shadow: 3px 3px 0 #000;
+			transform: translate(-1px, -1px);
+		}
+		button.outline {
+			background: #000;
+			color: #fff;
+			border: 2px solid #000;
+			padding: 0.4rem 0.75rem;
+			font-weight: 700;
+			font-size: 0.85rem;
+			cursor: pointer;
+			text-transform: uppercase;
+			letter-spacing: 0.5px;
+		}
+		button.outline:hover {
+			background: #333;
+		}
+		button.secondary {
+			background: #fff;
+			color: #000;
+		}
+		button.contrast {
+			background: #ff6b6b;
+			color: #000;
+			border-color: #000;
+		}
+		.breadcrumb {
+			font-size: 0.75rem;
+			color: #666;
+			margin-bottom: 0.25rem;
+			font-weight: 600;
+		}
+		.breadcrumb a {
+			color: #000;
+			text-decoration: none;
+			border-bottom: 1px solid #000;
+		}
+		.breadcrumb a:hover {
+			color: var(--accent-hover);
+		}
+		.tree-icon { margin-right: 0.25rem; }
+		.status-dot { margin-left: 0.25rem; }
+		.badge {
+			display: inline-block;
+			padding: 0.1rem 0.4rem;
+			font-size: 0.65rem;
+			font-weight: 700;
+			border: 1px solid #000;
+			background: #fff;
+			text-transform: uppercase;
+		}
+		.badge-warning { background: #ffd600; }
+		.badge-error { background: #ff6b6b; }
 	</style>
 </head>
 <body>
@@ -169,7 +292,7 @@
 	{{template "service-detail" .}}
 {{else}}
 <div class="main-content" style="align-items: center; justify-content: center;">
-	<p style="color: var(--muted-color);">Select a service or create a new one</p>
+	<p style="color: #888;">Select a service or create a new one</p>
 </div>
 {{end}}
 {{end}}
