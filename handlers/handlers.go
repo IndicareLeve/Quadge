@@ -61,14 +61,5 @@ func ParseTemplates(fs embed.FS) (*template.Template, error) {
 }
 
 func ToServices(files []system.QuadletFile) ([]Service, error) {
-	services := make([]Service, 0, len(files))
-	for _, f := range files {
-		status, _ := system.GetServiceStatus(f.Name)
-		services = append(services, Service{
-			Name:           f.Name,
-			Status:         status,
-			QuadletContent: f.Content,
-		})
-	}
-	return services, nil
+	return toServices(files), nil
 }

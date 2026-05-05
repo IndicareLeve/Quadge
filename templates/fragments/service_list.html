@@ -1,15 +1,30 @@
 {{define "service-list"}}
-{{range .Services}}
-<div class="service-item {{if eq .Name $.Selected}}active{{end}}" 
-     hx-get="/service/{{.Name}}" 
+{{range .Groups}}
+<div class="group-item"
+     hx-get="/group/{{.Name}}/children"
+     hx-target="next .group-children-{{.Name}}"
+     hx-swap="innerHTML">
+    <span class="tree-icon">▶</span>
+    <span>{{.Name}}</span>
+    {{if eq (string .Status) "running"}}<span class="status-dot status-running">●</span>
+    {{else if eq (string .Status) "failed"}}<span class="status-dot status-failed">●</span>
+    {{else if eq (string .Status) "degraded"}}<span class="status-dot status-degraded">●</span>
+    {{else}}<span class="status-dot status-stopped">○</span>{{end}}
+</div>
+<div class="group-children group-children-{{.Name}}"></div>
+{{end}}
+{{range .Standalone}}
+<div class="service-item {{if eq .Name $.Selected}}active{{end}}"
+     hx-get="/service/{{.Name}}"
      hx-target="#main-content"
      hx-swap="innerHTML">
-	<span>{{.Name}}</span>
-	{{if eq .Status "running"}}<span class="status-running">●</span>
-	{{else if eq .Status "failed"}}<span class="status-failed">●</span>
-	{{else}}<span class="status-stopped">○</span>{{end}}
+    <span>{{.Name}}</span>
+    {{if eq .Status "running"}}<span class="status-dot status-running">●</span>
+    {{else if eq .Status "failed"}}<span class="status-dot status-failed">●</span>
+    {{else}}<span class="status-dot status-stopped">○</span>{{end}}
 </div>
-{{else}}
+{{end}}
+{{if and (not .Groups) (not .Standalone)}}
 <p style="color: #888;">No services yet</p>
 {{end}}
 {{end}}
