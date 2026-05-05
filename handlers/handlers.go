@@ -13,6 +13,7 @@ type Service struct {
 	Name           string
 	Status         system.ServiceStatus
 	QuadletContent string
+	ParentGroup    string
 }
 
 type GroupStatus string

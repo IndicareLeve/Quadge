@@ -41,6 +41,8 @@ func GetService(w http.ResponseWriter, r *http.Request) {
 	groups := toServiceGroups(tree.Groups)
 	standalone := toServices(tree.Standalone)
 
+	parentGroup := findParentGroup(name, tree.Groups)
+
 	data := PageData{
 		Groups:     groups,
 		Standalone: standalone,
@@ -49,6 +51,7 @@ func GetService(w http.ResponseWriter, r *http.Request) {
 			Name:           file.Name,
 			Status:         status,
 			QuadletContent: file.Content,
+			ParentGroup:    parentGroup,
 		},
 	}
 
@@ -164,6 +167,17 @@ func calcGroupStatus(members []Service) GroupStatus {
 		return GroupStatusRunning
 	}
 	return GroupStatusStopped
+}
+
+func findParentGroup(serviceName string, groups []system.ServiceGroup) string {
+	for _, g := range groups {
+		for _, m := range g.Members {
+			if m.Name == serviceName {
+				return g.Name
+			}
+		}
+	}
+	return ""
 }
 
 func GetGroupChildren(w http.ResponseWriter, r *http.Request) {
