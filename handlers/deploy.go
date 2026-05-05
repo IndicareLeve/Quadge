@@ -31,17 +31,35 @@ func DeployService(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	for _, f := range files {
-		system.StartService(f.Name)
+	podName := findPodName(files)
+	if podName != "" {
+		system.StartService(podName)
+	} else {
+		for _, f := range files {
+			system.StartService(f.Name)
+		}
 	}
 
 	allFiles, _ := system.ListQuadletFiles()
-	services, _ := ToServices(allFiles)
+	tree := system.BuildServiceTree(allFiles)
+	groups := toServiceGroups(tree.Groups)
+	standalone := toServices(tree.Standalone)
 
+	selected := files[0].Name
 	data := PageData{
-		Services: services,
-		Selected: files[0].Name,
+		Groups:     groups,
+		Standalone: standalone,
+		Selected:   selected,
 	}
 
 	Tmpl.ExecuteTemplate(w, "main-content", data)
+}
+
+func findPodName(files []system.QuadletResult) string {
+	for _, f := range files {
+		if f.Ext == ".pod" {
+			return f.Name
+		}
+	}
+	return ""
 }

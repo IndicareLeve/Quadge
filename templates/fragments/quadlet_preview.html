@@ -1,9 +1,26 @@
 {{define "quadlet-preview"}}
-{{range .Files}}
-<div style="margin-bottom: 1rem;">
-	<strong>{{.Name}}</strong>
-	<pre>{{.Content}}</pre>
+<div style="margin-bottom: 0.5rem;">
+    <div class="btn-group" id="preview-tabs" style="margin-left: 0;">
+        {{range $i, $f := .Files}}
+        <button type="button" onclick="showPreviewTab({{$i}})" class="{{if eq $i 0}}active{{end}}" style="font-size: 0.75rem; padding: 0.25rem 0.5rem;">{{$f.Name}}</button>
+        {{end}}
+    </div>
+</div>
+{{range $i, $f := .Files}}
+<div class="preview-tab" id="preview-tab-{{$i}}" style="{{if ne $i 0}}display:none;{{end}}">
+    <pre style="background: #1a1a2e; padding: 0.75rem; border: var(--border-thick); box-shadow: var(--shadow); max-height: 40vh; overflow: auto; color: #ccc;"><code class="language-ini">{{$f.Content}}</code></pre>
 </div>
 {{end}}
-<input type="hidden" name="quadlet-data" value="{{.EncodedData}}">
+<input type="hidden" name="quadlet-data" id="quadlet-data" value="{{.EncodedData}}">
+<script>
+function showPreviewTab(idx) {
+    document.querySelectorAll('.preview-tab').forEach(function(el) { el.style.display = 'none'; });
+    document.getElementById('preview-tab-' + idx).style.display = 'block';
+    document.querySelectorAll('#preview-tabs button').forEach(function(btn) { btn.classList.remove('active'); });
+    document.querySelectorAll('#preview-tabs button')[idx].classList.add('active');
+    document.querySelectorAll('.preview-tab pre code').forEach(function(block) {
+        if (block.offsetParent !== null) hljs.highlightElement(block);
+    });
+}
+</script>
 {{end}}

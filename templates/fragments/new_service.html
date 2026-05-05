@@ -61,14 +61,17 @@ services:
             var parser = new DOMParser();
             var doc = parser.parseFromString(html, 'text/html');
             var hiddenInput = doc.querySelector('input[name="quadlet-data"]');
-            var previewDiv = doc.querySelector('pre');
-            if (hiddenInput && hiddenInput.value && previewDiv) {
+            var tabs = doc.querySelectorAll('.preview-tab');
+            if (hiddenInput && hiddenInput.value && tabs.length > 0) {
                 quadletData.value = hiddenInput.value;
                 quadletFiles = JSON.parse(atob(hiddenInput.value));
-                editor.value = previewDiv.textContent || previewDiv.innerText;
+                // Replace the right panel content with tabbed preview
+                var rightPanel = document.querySelector('.main-content .panel:last-child .panel-content');
+                if (rightPanel) {
+                    rightPanel.innerHTML = doc.querySelector('#preview-tabs').parentElement.innerHTML;
+                }
                 deployBtn.disabled = false;
-                statusArea.textContent = 'Converted — edit if needed, then Deploy';
-                statusArea.className = 'status-success';
+                isConverting = false;
             } else {
                 throw new Error('Conversion returned no content');
             }
@@ -83,8 +86,19 @@ services:
 
     editor.addEventListener('input', function() {
         if (quadletFiles && quadletFiles.length > 0) {
-            quadletFiles[0].Content = editor.value;
-            quadletData.value = btoa(JSON.stringify(quadletFiles));
+            // Update the first file's content (or the currently active tab's file)
+            var activeTab = document.querySelector('#preview-tabs button.active');
+            var tabIndex = 0;
+            if (activeTab) {
+                var allTabs = document.querySelectorAll('#preview-tabs button');
+                for (var i = 0; i < allTabs.length; i++) {
+                    if (allTabs[i] === activeTab) { tabIndex = i; break; }
+                }
+            }
+            if (tabIndex < quadletFiles.length) {
+                quadletFiles[tabIndex].Content = editor.value;
+                quadletData.value = btoa(JSON.stringify(quadletFiles));
+            }
         }
     });
 })();
