@@ -56,6 +56,10 @@ func GetService(w http.ResponseWriter, r *http.Request) {
 		},
 	}
 
+	w.Header().Set("Content-Type", "text/html")
+	w.Write([]byte(`<div id="service-list" hx-swap-oob="true">`))
+	Tmpl.ExecuteTemplate(w, "service-list", data)
+	w.Write([]byte(`</div>`))
 	Tmpl.ExecuteTemplate(w, "main-content", data)
 }
 

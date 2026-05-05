@@ -139,32 +139,20 @@ func isValidQuadletType(ext string) bool {
 	}
 }
 
-func ParsePodReferences(content string) []string {
-	var refs []string
-	inPodSection := false
+func ParsePodReference(content string) string {
 	scanner := bufio.NewScanner(strings.NewReader(content))
 	for scanner.Scan() {
 		line := strings.TrimSpace(scanner.Text())
-		if line == "" || strings.HasPrefix(line, "#") {
-			continue
-		}
-		if line == "[Pod]" {
-			inPodSection = true
-			continue
-		}
-		if strings.HasPrefix(line, "[") {
-			inPodSection = false
-			continue
-		}
-		if inPodSection && strings.HasPrefix(line, "ContainerName=") {
-			value := strings.TrimPrefix(line, "ContainerName=")
+		if strings.HasPrefix(line, "Pod=") {
+			value := strings.TrimPrefix(line, "Pod=")
 			value = strings.TrimSpace(value)
+			value = strings.TrimSuffix(value, ".pod")
 			if value != "" {
-				refs = append(refs, value)
+				return value
 			}
 		}
 	}
-	return refs
+	return ""
 }
 
 type ServiceTree struct {
@@ -190,22 +178,23 @@ func BuildServiceTree(files []QuadletFile) ServiceTree {
 		}
 	}
 
+	groupMembers := make(map[string][]QuadletFile)
 	referencedNames := make(map[string]bool)
-	var groups []ServiceGroup
 
-	for podName, podFile := range podFiles {
-		refs := ParsePodReferences(podFile.Content)
-		var members []QuadletFile
-		for _, ref := range refs {
-			if member, ok := otherFiles[ref]; ok {
-				members = append(members, member)
-				referencedNames[ref] = true
-			}
+	for name, f := range otherFiles {
+		podRef := ParsePodReference(f.Content)
+		if podRef != "" {
+			groupMembers[podRef] = append(groupMembers[podRef], f)
+			referencedNames[name] = true
 		}
+	}
+
+	var groups []ServiceGroup
+	for podName, podFile := range podFiles {
 		groups = append(groups, ServiceGroup{
 			Name:    podName,
 			PodFile: podFile,
-			Members: members,
+			Members: groupMembers[podName],
 		})
 	}
 
