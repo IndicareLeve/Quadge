@@ -15,11 +15,29 @@ type Service struct {
 	QuadletContent string
 }
 
+type GroupStatus string
+
+const (
+	GroupStatusRunning  GroupStatus = "running"
+	GroupStatusDegraded GroupStatus = "degraded"
+	GroupStatusStopped  GroupStatus = "stopped"
+	GroupStatusFailed   GroupStatus = "failed"
+)
+
+type ServiceGroup struct {
+	Name    string
+	PodFile QuadletFileView
+	Members []Service
+	Status  GroupStatus
+}
+
 type PageData struct {
-	Services []Service
-	Selected string
-	Service  *Service
-	Edit     *EditData
+	Services   []Service
+	Groups     []ServiceGroup
+	Standalone []Service
+	Selected   string
+	Service    *Service
+	Edit       *EditData
 }
 
 type EditData struct {
