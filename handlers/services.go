@@ -103,7 +103,58 @@ func RestartService(w http.ResponseWriter, r *http.Request) {
 	renderServiceList(w, name)
 }
 
-func renderServiceList(w http.ResponseWriter, selected string) {
+func StartGroup(w http.ResponseWriter, r *http.Request) {
+	name := r.PathValue("name")
+	if err := system.StartService(name); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	renderGroupedList(w, name)
+}
+
+func StopGroup(w http.ResponseWriter, r *http.Request) {
+	name := r.PathValue("name")
+	if err := system.StopService(name); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	renderGroupedList(w, name)
+}
+
+func DeleteGroup(w http.ResponseWriter, r *http.Request) {
+	name := r.PathValue("name")
+
+	files, err := system.ListQuadletFiles()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	tree := system.BuildServiceTree(files)
+	for _, g := range tree.Groups {
+		if g.Name == name {
+			system.StopService(name)
+			if err := system.DeleteQuadletFile(name); err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			for _, m := range g.Members {
+				system.StopService(m.Name)
+				system.DeleteQuadletFile(m.Name)
+			}
+			if err := system.DaemonReload(); err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			renderGroupedList(w, "")
+			return
+		}
+	}
+
+	http.Error(w, "group not found", http.StatusNotFound)
+}
+
+func renderGroupedList(w http.ResponseWriter, selected string) {
 	files, _ := system.ListQuadletFiles()
 	tree := system.BuildServiceTree(files)
 	groups := toServiceGroups(tree.Groups)
@@ -116,6 +167,10 @@ func renderServiceList(w http.ResponseWriter, selected string) {
 	}
 
 	Tmpl.ExecuteTemplate(w, "service-list", data)
+}
+
+func renderServiceList(w http.ResponseWriter, selected string) {
+	renderGroupedList(w, selected)
 }
 
 func toServiceGroups(groups []system.ServiceGroup) []ServiceGroup {

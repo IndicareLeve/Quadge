@@ -39,6 +39,9 @@ func main() {
 	r.Get("/edit", handlers.EditServiceForm)
 	r.Post("/edit", handlers.EditService)
 	r.Get("/group/{name}/children", handlers.GetGroupChildren)
+	r.Post("/group/{name}/start", handlers.StartGroup)
+	r.Post("/group/{name}/stop", handlers.StopGroup)
+	r.Post("/group/{name}/delete", handlers.DeleteGroup)
 
 	port := os.Getenv("QUADGE_PORT")
 	if port == "" {
