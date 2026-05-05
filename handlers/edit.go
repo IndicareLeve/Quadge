@@ -19,11 +19,16 @@ func EditServiceForm(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	files, _ := system.ListQuadletFiles()
+	tree := system.BuildServiceTree(files)
+	parentGroup := findParentGroup(name, tree.Groups)
+
 	data := PageData{
 		Selected: name,
 		Service: &Service{
 			Name:           file.Name,
 			QuadletContent: file.Content,
+			ParentGroup:    parentGroup,
 		},
 		Edit: &EditData{
 			Name:    file.Name,
