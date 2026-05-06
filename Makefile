@@ -9,7 +9,7 @@ build:
 	go build -ldflags="-s -w" -o $(BINARY_NAME) .
 
 dev:
-	go run .
+	QUADGE_PORT=4444 go run .
 
 install: build
 	mkdir -p $(INSTALL_DIR)

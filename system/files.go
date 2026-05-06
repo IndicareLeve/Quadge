@@ -1,9 +1,11 @@
 package system
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 )
 
@@ -134,5 +136,96 @@ func isValidQuadletType(ext string) bool {
 		return true
 	default:
 		return false
+	}
+}
+
+func ParsePodReference(content string) string {
+	scanner := bufio.NewScanner(strings.NewReader(content))
+	for scanner.Scan() {
+		line := strings.TrimSpace(scanner.Text())
+		if strings.HasPrefix(line, "Pod=") {
+			value := strings.TrimPrefix(line, "Pod=")
+			value = strings.TrimSpace(value)
+			value = strings.TrimSuffix(value, ".pod")
+			if value != "" {
+				return value
+			}
+		}
+	}
+	return ""
+}
+
+type ServiceTree struct {
+	Groups     []ServiceGroup
+	Standalone []QuadletFile
+}
+
+type ServiceGroup struct {
+	Name    string
+	PodFile QuadletFile
+	Members []QuadletFile
+}
+
+func BuildServiceTree(files []QuadletFile) ServiceTree {
+	podFiles := make(map[string]QuadletFile)
+	otherFiles := make(map[string]QuadletFile)
+
+	for _, f := range files {
+		if f.Type == "pod" {
+			podFiles[f.Name] = f
+		} else {
+			otherFiles[f.Name] = f
+		}
+	}
+
+	groupMembers := make(map[string][]QuadletFile)
+	referencedNames := make(map[string]bool)
+
+	for name, f := range otherFiles {
+		podRef := ParsePodReference(f.Content)
+		if podRef != "" {
+			groupMembers[podRef] = append(groupMembers[podRef], f)
+			referencedNames[name] = true
+		}
+	}
+
+	for podName := range podFiles {
+		for name, f := range otherFiles {
+			if referencedNames[name] {
+				continue
+			}
+			if name == podName || strings.HasPrefix(name, podName+"-") {
+				groupMembers[podName] = append(groupMembers[podName], f)
+				referencedNames[name] = true
+			}
+		}
+	}
+
+	var groups []ServiceGroup
+	for podName, podFile := range podFiles {
+		groups = append(groups, ServiceGroup{
+			Name:    podName,
+			PodFile: podFile,
+			Members: groupMembers[podName],
+		})
+	}
+
+	var standalone []QuadletFile
+	for name, f := range otherFiles {
+		if !referencedNames[name] {
+			standalone = append(standalone, f)
+		}
+	}
+
+	slices.SortFunc(groups, func(a, b ServiceGroup) int {
+		return strings.Compare(a.Name, b.Name)
+	})
+	slices.SortFunc(standalone, func(a, b QuadletFile) int {
+		return strings.Compare(a.Name, b.Name)
+	})
+
+	return ServiceTree{
+		Groups:     groups,
+		Standalone: standalone,
 	}
 }

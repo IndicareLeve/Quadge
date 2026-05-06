@@ -1,15 +1,30 @@
 {{define "service-list"}}
-{{range .Services}}
-<div class="service-item {{if eq .Name $.Selected}}active{{end}}" 
-     hx-get="/service/{{.Name}}" 
-     hx-target="#main-content"
-     hx-swap="innerHTML">
-	<span>{{.Name}}</span>
-	{{if eq .Status "running"}}<span class="status-running">●</span>
-	{{else if eq .Status "failed"}}<span class="status-failed">●</span>
-	{{else}}<span class="status-stopped">○</span>{{end}}
+{{range .Groups}}
+<div class="group-item"
+     onclick="toggleGroup(this)"
+     data-group="{{.Name}}">
+    <span class="item-label"><span class="tree-icon">▶</span> {{.Name}}</span>
+    <span class="item-status">
+        {{if eq .Status "running"}}<span class="status-running">●</span>
+        {{else if eq .Status "failed"}}<span class="status-failed">●</span>
+        {{else if eq .Status "degraded"}}<span class="status-degraded">●</span>
+        {{else}}<span class="status-stopped">○</span>{{end}}
+    </span>
+    <span class="type-badge type-badge-pod">pod</span>
 </div>
-{{else}}
-<p style="color: var(--muted-color);">No services yet</p>
+<div class="group-children group-children-{{.Name}}" style="display:none;"></div>
+{{end}}
+{{range .Standalone}}
+<div class="service-item {{if eq .Name $.Selected}}active{{end}}"
+     hx-get="/service/{{.Name}}"
+     hx-target="#main-content"
+     hx-swap="innerHTML"
+     hx-on::after-request="document.querySelectorAll('.service-item, .group-child-item').forEach(function(el){el.classList.remove('active')});this.classList.add('active');">
+    <span class="item-label"><span class="status-dot status-{{.Status}}">{{if eq .Status "running"}}●{{else}}○{{end}}</span> {{.Name}}</span>
+    <span class="type-badge type-badge-{{.Type}}">{{.Type}}</span>
+</div>
+{{end}}
+{{if and (not .Groups) (not .Standalone)}}
+<p style="color: #000;">No services yet</p>
 {{end}}
 {{end}}

@@ -1,42 +1,48 @@
 {{define "service-detail"}}
 {{if .Service}}
 <div class="main-header">
-	<hgroup style="margin: 0;">
-		<h4 style="margin: 0;">{{.Service.Name}}</h4>
-		<p style="margin: 0;">
-			{{if eq .Service.Status "running"}}<span class="status-running">● Running</span>
-			{{else if eq .Service.Status "failed"}}<span class="status-failed">● Failed</span>
-			{{else}}<span class="status-stopped">○ Stopped</span>{{end}}
-		</p>
-	</hgroup>
-	<div class="btn-group" style="margin-left: auto;">
-		{{if eq .Service.Status "running"}}
-		<button hx-post="/stop?service={{.Service.Name}}" hx-target="#service-list" hx-swap="innerHTML">Stop</button>
-		<button hx-post="/restart?service={{.Service.Name}}" hx-target="#service-list" hx-swap="innerHTML">Restart</button>
-		{{else}}
-		<button hx-post="/start?service={{.Service.Name}}" hx-target="#service-list" hx-swap="innerHTML">Start</button>
-		{{end}}
-		<button hx-get="/edit?service={{.Service.Name}}" hx-target="#main-content" hx-swap="innerHTML" class="secondary">Edit</button>
-		<button class="contrast" onclick="if(confirm('Delete {{.Service.Name}}?')){htmx.trigger(this, 'delete-service')}" hx-post="/delete?service={{.Service.Name}}" hx-target="#service-list" hx-swap="innerHTML">Delete</button>
-	</div>
+    <div>
+        {{if .Service.ParentGroup}}
+        <div class="breadcrumb">
+            <a href="#" hx-get="/group/{{.Service.ParentGroup}}/children" hx-target="next .group-children-{{.Service.ParentGroup}}" hx-swap="innerHTML">{{.Service.ParentGroup}}</a>
+            &gt; {{.Service.Name}}
+        </div>
+        {{end}}
+        <h4>{{.Service.Name}}</h4>
+        <p style="margin: 0;">
+            {{if eq .Service.Status "running"}}<span class="status-running">● Running</span>
+            {{else if eq .Service.Status "failed"}}<span class="status-failed">● Failed</span>
+            {{else}}<span class="status-stopped">○ Stopped</span>{{end}}
+        </p>
+    </div>
+    <div class="btn-group">
+        {{if eq .Service.Status "running"}}
+        <button hx-post="/stop?service={{.Service.Name}}" hx-target="#service-list" hx-swap="innerHTML">Stop</button>
+        <button hx-post="/restart?service={{.Service.Name}}" hx-target="#service-list" hx-swap="innerHTML">Restart</button>
+        {{else}}
+        <button hx-post="/start?service={{.Service.Name}}" hx-target="#service-list" hx-swap="innerHTML">Start</button>
+        {{end}}
+        <button hx-get="/edit?service={{.Service.Name}}" hx-target="#main-content" hx-swap="innerHTML" class="secondary">Edit</button>
+        <button class="contrast" onclick="if(confirm('Delete {{.Service.Name}}?')){htmx.trigger(this, 'delete-service')}" hx-post="/delete?service={{.Service.Name}}" hx-target="#service-list" hx-swap="innerHTML">Delete</button>
+    </div>
 </div>
 <div class="main-content">
-	<div class="panel">
-		<div class="panel-header">Logs</div>
-		<div class="panel-content logs" hx-ext="sse" sse-connect="/logs?service={{.Service.Name}}" sse-swap="message" hx-swap="beforeend" style="max-height: 30vh;">
-		</div>
-	</div>
-	<div class="panel">
-		<div class="panel-header">Quadlet</div>
-		<div class="panel-content" style="background: #1a1a1a; display: flex; flex-direction: column; padding: 0;">
-			<pre style="flex: 1; margin: 0; padding: 0.5rem; overflow: auto;"><code class="language-ini" id="quadlet-code">{{.Service.QuadletContent}}</code></pre>
-		</div>
-	</div>
+    <div class="panel">
+        <div class="panel-header">Logs</div>
+        <div class="panel-content logs" hx-ext="sse" sse-connect="/logs?service={{.Service.Name}}" sse-swap="message" hx-swap="beforeend" style="max-height: 30vh;">
+        </div>
+    </div>
+    <div class="panel">
+        <div class="panel-header">Quadlet</div>
+        <div class="panel-content" style="background: #1a1a2e; display: flex; flex-direction: column; padding: 0;">
+            <pre style="flex: 1; margin: 0; padding: 0.5rem; overflow: auto;"><code class="language-ini" id="quadlet-code">{{.Service.QuadletContent}}</code></pre>
+        </div>
+    </div>
 </div>
 <script>hljs.highlightElement(document.getElementById('quadlet-code'));</script>
 {{else}}
 <div class="main-content" style="align-items: center; justify-content: center;">
-	<p style="color: var(--muted-color);">Select a service or create a new one</p>
+    <p style="color: #888;">Select a service or create a new one</p>
 </div>
 {{end}}
 {{end}}
