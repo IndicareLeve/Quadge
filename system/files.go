@@ -194,7 +194,7 @@ func BuildServiceTree(files []QuadletFile) ServiceTree {
 			if referencedNames[name] {
 				continue
 			}
-			if strings.HasPrefix(name, podName+"-") {
+			if name == podName || strings.HasPrefix(name, podName+"-") {
 				groupMembers[podName] = append(groupMembers[podName], f)
 				referencedNames[name] = true
 			}

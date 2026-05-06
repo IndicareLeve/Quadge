@@ -295,6 +295,21 @@
 		</main>
 	</div>
 	<script>
+		function toggleGroup(el) {
+			var name = el.getAttribute('data-group');
+			var children = el.nextElementSibling;
+			var icon = el.querySelector('.tree-icon');
+			if (children.innerHTML.trim() === '') {
+				htmx.ajax('GET', '/group/' + name + '/children', {target: children, swap: 'innerHTML'});
+				icon.textContent = '▼';
+			} else if (children.style.display === 'none') {
+				children.style.display = '';
+				icon.textContent = '▼';
+			} else {
+				children.style.display = 'none';
+				icon.textContent = '▶';
+			}
+		}
 		document.body.addEventListener('htmx:afterSettle', function() {
 			document.querySelectorAll('pre code:not(.hljs)').forEach((block) => {
 				hljs.highlightElement(block);
@@ -312,7 +327,7 @@
 	{{template "service-detail" .}}
 {{else}}
 <div class="main-content" style="align-items: center; justify-content: center;">
-	<p style="color: #888;">Select a service or create a new one</p>
+	<p style="color: #000;">Select a service or create a new one</p>
 </div>
 {{end}}
 {{end}}

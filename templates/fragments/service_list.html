@@ -1,9 +1,8 @@
 {{define "service-list"}}
 {{range .Groups}}
 <div class="group-item"
-     hx-get="/group/{{.Name}}/children"
-     hx-target="next .group-children-{{.Name}}"
-     hx-swap="innerHTML">
+     onclick="toggleGroup(this)"
+     data-group="{{.Name}}">
     <span class="tree-icon">▶</span>
     <span>{{.Name}}</span>
     <span class="type-badge type-badge-pod">pod</span>
@@ -12,13 +11,14 @@
     {{else if eq .Status "degraded"}}<span class="status-dot status-degraded">●</span>
     {{else}}<span class="status-dot status-stopped">○</span>{{end}}
 </div>
-<div class="group-children group-children-{{.Name}}"></div>
+<div class="group-children group-children-{{.Name}}" style="display:none;"></div>
 {{end}}
 {{range .Standalone}}
 <div class="service-item {{if eq .Name $.Selected}}active{{end}}"
      hx-get="/service/{{.Name}}"
      hx-target="#main-content"
-     hx-swap="innerHTML">
+     hx-swap="innerHTML"
+     hx-on::after-request="document.querySelectorAll('.service-item, .group-child-item').forEach(function(el){el.classList.remove('active')});this.classList.add('active');">
     <span>{{.Name}}</span>
     <span class="type-badge type-badge-{{.Type}}">{{.Type}}</span>
     {{if eq .Status "running"}}<span class="status-dot status-running">●</span>

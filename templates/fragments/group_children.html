@@ -3,7 +3,8 @@
 <div class="group-child-item {{if eq .Name $.Selected}}active{{end}}"
      hx-get="/service/{{.Name}}"
      hx-target="#main-content"
-     hx-swap="innerHTML">
+     hx-swap="innerHTML"
+     hx-on::after-request="document.querySelectorAll('.service-item, .group-child-item').forEach(function(el){el.classList.remove('active')});this.classList.add('active');">
     <span>{{.Name}}</span>
     <span class="type-badge type-badge-{{.Type}}">{{.Type}}</span>
     {{if eq .Status "running"}}<span class="status-dot status-running">●</span>
