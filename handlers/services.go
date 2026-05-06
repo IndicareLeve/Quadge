@@ -204,6 +204,7 @@ func toServices(files []system.QuadletFile) []Service {
 		status, _ := system.GetServiceStatus(f.Name)
 		services = append(services, Service{
 			Name:           f.Name,
+			Type:           f.Type,
 			Status:         status,
 			QuadletContent: f.Content,
 		})

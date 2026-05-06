@@ -5,13 +5,14 @@
      hx-target="#main-content"
      hx-swap="innerHTML">
     <span>{{.Name}}</span>
+    <span class="type-badge type-badge-{{.Type}}">{{.Type}}</span>
     {{if eq .Status "running"}}<span class="status-dot status-running">●</span>
     {{else if eq .Status "failed"}}<span class="status-dot status-failed">●</span>
     {{else}}<span class="status-dot status-stopped">○</span>{{end}}
 </div>
 {{end}}
 {{if not .Members}}
-<div class="group-child-item" style="color: #888; cursor: default;">
+<div class="group-child-item" style="color: #000; cursor: default;">
     <span class="badge badge-warning">no members</span>
 </div>
 {{end}}

@@ -11,6 +11,7 @@ var Tmpl *template.Template
 
 type Service struct {
 	Name           string
+	Type           string
 	Status         system.ServiceStatus
 	QuadletContent string
 	ParentGroup    string

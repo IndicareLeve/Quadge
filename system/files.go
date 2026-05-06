@@ -189,6 +189,18 @@ func BuildServiceTree(files []QuadletFile) ServiceTree {
 		}
 	}
 
+	for podName := range podFiles {
+		for name, f := range otherFiles {
+			if referencedNames[name] {
+				continue
+			}
+			if strings.HasPrefix(name, podName+"-") {
+				groupMembers[podName] = append(groupMembers[podName], f)
+				referencedNames[name] = true
+			}
+		}
+	}
+
 	var groups []ServiceGroup
 	for podName, podFile := range podFiles {
 		groups = append(groups, ServiceGroup{

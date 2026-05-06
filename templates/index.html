@@ -61,9 +61,10 @@
 			font-weight: 700;
 			font-size: 0.85rem;
 			border: 2px solid transparent;
+			color: #000;
 		}
 		.service-item:hover {
-			background: rgba(255,255,255,0.5);
+			background: rgba(255,255,255,0.7);
 		}
 		.service-item.active {
 			background: #fff;
@@ -74,12 +75,13 @@
 			cursor: pointer;
 			font-weight: 800;
 			font-size: 0.85rem;
-			background: #fff3a0;
+			background: #fff;
 			border: 2px solid #000;
 			margin-bottom: 0;
+			color: #000;
 		}
 		.group-item:hover {
-			background: var(--accent);
+			background: #fff3a0;
 		}
 		.group-children {
 			margin-left: 0.75rem;
@@ -93,6 +95,7 @@
 			background: #fff;
 			margin-bottom: 0;
 			border-left: 2px solid #000;
+			color: #000;
 		}
 		.group-child-item:hover {
 			background: #f0f0f0;
@@ -100,6 +103,23 @@
 		.group-child-item.active {
 			background: var(--accent);
 		}
+		.type-badge {
+			display: inline-block;
+			padding: 0.05rem 0.3rem;
+			font-size: 0.6rem;
+			font-weight: 700;
+			border: 1px solid #000;
+			background: rgba(255,255,255,0.7);
+			text-transform: uppercase;
+			letter-spacing: 0.5px;
+			margin-left: 0.3rem;
+			vertical-align: middle;
+		}
+		.type-badge-pod { background: #ffd600; }
+		.type-badge-container { background: #4dabf7; }
+		.type-badge-volume { background: #a855f7; }
+		.type-badge-network { background: #51cf66; }
+		.type-badge-kube { background: #ff6b6b; }
 		.main {
 			flex: 1;
 			display: flex;
@@ -149,7 +169,7 @@
 			box-shadow: var(--shadow);
 		}
 		.status-running { color: #0a0; font-weight: bold; }
-		.status-stopped { color: #333; }
+		.status-stopped { color: #000; }
 		.status-failed { color: #dc3545; font-weight: bold; }
 		.status-success { color: #0a0; }
 		.status-error { color: #dc3545; }

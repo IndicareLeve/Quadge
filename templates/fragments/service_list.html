@@ -6,6 +6,7 @@
      hx-swap="innerHTML">
     <span class="tree-icon">▶</span>
     <span>{{.Name}}</span>
+    <span class="type-badge type-badge-pod">pod</span>
     {{if eq .Status "running"}}<span class="status-dot status-running">●</span>
     {{else if eq .Status "failed"}}<span class="status-dot status-failed">●</span>
     {{else if eq .Status "degraded"}}<span class="status-dot status-degraded">●</span>
@@ -19,12 +20,13 @@
      hx-target="#main-content"
      hx-swap="innerHTML">
     <span>{{.Name}}</span>
+    <span class="type-badge type-badge-{{.Type}}">{{.Type}}</span>
     {{if eq .Status "running"}}<span class="status-dot status-running">●</span>
     {{else if eq .Status "failed"}}<span class="status-dot status-failed">●</span>
     {{else}}<span class="status-dot status-stopped">○</span>{{end}}
 </div>
 {{end}}
 {{if and (not .Groups) (not .Standalone)}}
-<p style="color: #888;">No services yet</p>
+<p style="color: #000;">No services yet</p>
 {{end}}
 {{end}}
