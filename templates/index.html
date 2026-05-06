@@ -18,7 +18,7 @@
 			--shadow-offset: 4px;
 			--shadow: 4px 4px 0 #000;
 			--radius: 0;
-			--sidebar-width: 240px;
+			--sidebar-width: 300px;
 			--font-body: system-ui, -apple-system, sans-serif;
 			--font-mono: 'JetBrains Mono', 'Fira Code', monospace;
 		}
@@ -54,6 +54,9 @@
 			overflow-y: auto;
 		}
 		.service-item {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
 			padding: 0.4rem 0.5rem;
 			cursor: pointer;
 			border-radius: 0;
@@ -62,6 +65,7 @@
 			font-size: 0.85rem;
 			border: 2px solid transparent;
 			color: #000;
+			gap: 0.5rem;
 		}
 		.service-item:hover {
 			background: rgba(255,255,255,0.7);
@@ -71,6 +75,9 @@
 			border-color: #000;
 		}
 		.group-item {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
 			padding: 0.4rem 0.5rem;
 			cursor: pointer;
 			font-weight: 800;
@@ -79,6 +86,7 @@
 			border: 2px solid #000;
 			margin-bottom: 0;
 			color: #000;
+			gap: 0.5rem;
 		}
 		.group-item:hover {
 			background: #fff3a0;
@@ -88,6 +96,9 @@
 			border-left: 2px solid #000;
 		}
 		.group-child-item {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
 			padding: 0.3rem 0.5rem;
 			cursor: pointer;
 			font-weight: 600;
@@ -96,6 +107,7 @@
 			margin-bottom: 0;
 			border-left: 2px solid #000;
 			color: #000;
+			gap: 0.5rem;
 		}
 		.group-child-item:hover {
 			background: #f0f0f0;
@@ -105,15 +117,15 @@
 		}
 		.type-badge {
 			display: inline-block;
-			padding: 0.05rem 0.3rem;
-			font-size: 0.6rem;
+			padding: 0.05rem 0.25rem;
+			font-size: 0.55rem;
 			font-weight: 700;
 			border: 1px solid #000;
 			background: rgba(255,255,255,0.7);
 			text-transform: uppercase;
 			letter-spacing: 0.5px;
-			margin-left: 0.3rem;
 			vertical-align: middle;
+			white-space: nowrap;
 		}
 		.type-badge-pod { background: #ffd600; }
 		.type-badge-container { background: #4dabf7; }
@@ -266,6 +278,7 @@
 		}
 		.tree-icon { margin-right: 0.25rem; }
 		.status-dot { margin-left: 0.25rem; }
+		.group-item .status-dot, .service-item .status-dot, .group-child-item .status-dot { margin-left: 0; margin-right: 0.35rem; }
 		.badge {
 			display: inline-block;
 			padding: 0.1rem 0.4rem;
