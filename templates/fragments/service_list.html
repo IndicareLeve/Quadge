@@ -3,7 +3,6 @@
 <div class="group-item"
      onclick="toggleGroup(this)"
      data-group="{{.Name}}">
-    <span class="type-badge type-badge-pod">pod</span>
     <span class="item-label"><span class="tree-icon">▶</span> {{.Name}}</span>
     <span class="item-status">
         {{if eq .Status "running"}}<span class="status-running">●</span>
@@ -11,6 +10,7 @@
         {{else if eq .Status "degraded"}}<span class="status-degraded">●</span>
         {{else}}<span class="status-stopped">○</span>{{end}}
     </span>
+    <span class="type-badge type-badge-pod">pod</span>
 </div>
 <div class="group-children group-children-{{.Name}}" style="display:none;"></div>
 {{end}}
@@ -20,8 +20,8 @@
      hx-target="#main-content"
      hx-swap="innerHTML"
      hx-on::after-request="document.querySelectorAll('.service-item, .group-child-item').forEach(function(el){el.classList.remove('active')});this.classList.add('active');">
-    <span class="type-badge type-badge-{{.Type}}">{{.Type}}</span>
     <span class="item-label"><span class="status-dot status-{{.Status}}">{{if eq .Status "running"}}●{{else}}○{{end}}</span> {{.Name}}</span>
+    <span class="type-badge type-badge-{{.Type}}">{{.Type}}</span>
 </div>
 {{end}}
 {{if and (not .Groups) (not .Standalone)}}

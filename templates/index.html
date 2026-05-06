@@ -55,8 +55,8 @@
 		}
 		.service-item {
 			display: flex;
-			flex-direction: column;
-			align-items: flex-start;
+			align-items: center;
+			justify-content: space-between;
 			padding: 0.3rem 0.5rem;
 			cursor: pointer;
 			border-radius: 0;
@@ -65,7 +65,7 @@
 			font-size: 0.85rem;
 			border: 2px solid transparent;
 			color: #000;
-			gap: 0.1rem;
+			gap: 0.4rem;
 		}
 		.service-item:hover {
 			background: rgba(255,255,255,0.7);
@@ -97,8 +97,8 @@
 		}
 		.group-child-item {
 			display: flex;
-			flex-direction: column;
-			align-items: flex-start;
+			align-items: center;
+			justify-content: space-between;
 			padding: 0.2rem 0.5rem;
 			cursor: pointer;
 			font-weight: 600;
@@ -107,7 +107,7 @@
 			margin-bottom: 0;
 			border-left: 2px solid #000;
 			color: #000;
-			gap: 0.1rem;
+			gap: 0.4rem;
 		}
 		.group-child-item:hover {
 			background: #f0f0f0;
@@ -116,7 +116,7 @@
 			background: var(--accent);
 		}
 		.item-label {
-			width: 100%;
+			flex: 1;
 			min-width: 0;
 			overflow: hidden;
 			text-overflow: ellipsis;
