@@ -12,6 +12,7 @@ dev:
 	go run .
 
 install: build
+	systemctl --user stop $(BINARY_NAME)
 	mkdir -p $(INSTALL_DIR)
 	cp $(BINARY_NAME) $(INSTALL_DIR)/
 	mkdir -p $(SERVICE_DIR)
