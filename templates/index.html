@@ -18,7 +18,7 @@
 			--shadow-offset: 4px;
 			--shadow: 4px 4px 0 #000;
 			--radius: 0;
-			--sidebar-width: 300px;
+			--sidebar-width: 360px;
 			--font-body: system-ui, -apple-system, sans-serif;
 			--font-mono: 'JetBrains Mono', 'Fira Code', monospace;
 		}
@@ -55,9 +55,9 @@
 		}
 		.service-item {
 			display: flex;
-			align-items: center;
-			justify-content: space-between;
-			padding: 0.4rem 0.5rem;
+			flex-direction: column;
+			align-items: flex-start;
+			padding: 0.3rem 0.5rem;
 			cursor: pointer;
 			border-radius: 0;
 			margin-bottom: 0.25rem;
@@ -65,7 +65,7 @@
 			font-size: 0.85rem;
 			border: 2px solid transparent;
 			color: #000;
-			gap: 0.5rem;
+			gap: 0.1rem;
 		}
 		.service-item:hover {
 			background: rgba(255,255,255,0.7);
@@ -78,7 +78,7 @@
 			display: flex;
 			align-items: center;
 			justify-content: space-between;
-			padding: 0.4rem 0.5rem;
+			padding: 0.3rem 0.5rem;
 			cursor: pointer;
 			font-weight: 800;
 			font-size: 0.85rem;
@@ -86,7 +86,7 @@
 			border: 2px solid #000;
 			margin-bottom: 0;
 			color: #000;
-			gap: 0.5rem;
+			gap: 0.4rem;
 		}
 		.group-item:hover {
 			background: #fff3a0;
@@ -97,9 +97,9 @@
 		}
 		.group-child-item {
 			display: flex;
-			align-items: center;
-			justify-content: space-between;
-			padding: 0.3rem 0.5rem;
+			flex-direction: column;
+			align-items: flex-start;
+			padding: 0.2rem 0.5rem;
 			cursor: pointer;
 			font-weight: 600;
 			font-size: 0.8rem;
@@ -107,7 +107,7 @@
 			margin-bottom: 0;
 			border-left: 2px solid #000;
 			color: #000;
-			gap: 0.5rem;
+			gap: 0.1rem;
 		}
 		.group-child-item:hover {
 			background: #f0f0f0;
@@ -115,10 +115,20 @@
 		.group-child-item.active {
 			background: var(--accent);
 		}
+		.item-label {
+			width: 100%;
+			min-width: 0;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
+		.item-status {
+			flex-shrink: 0;
+		}
 		.type-badge {
 			display: inline-block;
-			padding: 0.05rem 0.25rem;
-			font-size: 0.55rem;
+			padding: 0.02rem 0.2rem;
+			font-size: 0.45rem;
 			font-weight: 700;
 			border: 1px solid #000;
 			background: rgba(255,255,255,0.7);
@@ -126,6 +136,7 @@
 			letter-spacing: 0.5px;
 			vertical-align: middle;
 			white-space: nowrap;
+			line-height: 1.2;
 		}
 		.type-badge-pod { background: #ffd600; }
 		.type-badge-container { background: #4dabf7; }
@@ -278,7 +289,6 @@
 		}
 		.tree-icon { margin-right: 0.25rem; }
 		.status-dot { margin-left: 0.25rem; }
-		.group-item .status-dot, .service-item .status-dot, .group-child-item .status-dot { margin-left: 0; margin-right: 0.35rem; }
 		.badge {
 			display: inline-block;
 			padding: 0.1rem 0.4rem;
@@ -314,6 +324,7 @@
 			var icon = el.querySelector('.tree-icon');
 			if (children.innerHTML.trim() === '') {
 				htmx.ajax('GET', '/group/' + name + '/children', {target: children, swap: 'innerHTML'});
+				children.style.display = '';
 				icon.textContent = '▼';
 			} else if (children.style.display === 'none') {
 				children.style.display = '';
